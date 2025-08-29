@@ -96,6 +96,26 @@ generatePDF.addEventListener("click", async () => {
   pdf.save(`${fileName}.pdf`);
 });
 
+document.getElementById("sendWhatsApp").addEventListener("click", () => {
+  // Tomar el número escrito
+  const phoneNumber = document.getElementById("whatsappNumber").value.trim();
+
+  if (!phoneNumber) {
+    alert("Por favor, escribe un número de WhatsApp.");
+    return;
+  }
+
+  // Mensaje automático
+  const message = "Hola, aquí te envío el comprobante bancario en PDF.";
+
+  // Crear URL de WhatsApp
+  const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+  // Abrir chat en nueva pestaña
+  window.open(url, "_blank");
+});
+
+
 
 function readFileAsync(file) {
   return new Promise((resolve) => {
