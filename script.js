@@ -31,13 +31,19 @@ generatePDF.addEventListener("click", async () => {
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
 
+  const cols = 2; // 2 columnas
+  const rows = 2; // 2 filas -> 4 imágenes por página
+  const cellWidth = (pageWidth - margin * (cols + 1)) / cols;
+  const cellHeight = (pageHeight - margin * (rows + 1)) / rows;
+
   for (let i = 0; i < images.length; i++) {
-    if (i > 0) pdf.addPage();
+    if (i > 0 && i % (cols * rows) === 0) {
+      pdf.addPage();
+    }
 
     const file = images[i];
     const reader = await readFileAsync(file);
 
-    // Crear imagen en memoria para leer sus dimensiones originales
     const img = new Image();
     img.src = reader;
 
@@ -46,16 +52,17 @@ generatePDF.addEventListener("click", async () => {
         let imgW = img.width;
         let imgH = img.height;
 
-        // Escalar manteniendo proporción dentro de la hoja
-        const maxW = pageWidth - margin * 2;
-        const maxH = pageHeight - margin * 2;
-        const ratio = Math.min(maxW / imgW, maxH / imgH);
-
+        // Escalar manteniendo proporción dentro de la celda
+        const ratio = Math.min(cellWidth / imgW, cellHeight / imgH);
         imgW *= ratio;
         imgH *= ratio;
 
-        const x = (pageWidth - imgW) / 2; // centrar
-        const y = (pageHeight - imgH) / 2;
+        // Calcular posición en la celda
+        const col = i % cols;
+        const row = Math.floor((i % (cols * rows)) / cols);
+
+        const x = margin + col * (cellWidth + margin) + (cellWidth - imgW) / 2;
+        const y = margin + row * (cellHeight + margin) + (cellHeight - imgH) / 2;
 
         pdf.addImage(reader, "JPEG", x, y, imgW, imgH);
         resolve();
@@ -65,6 +72,7 @@ generatePDF.addEventListener("click", async () => {
 
   pdf.save("comprobantes.pdf");
 });
+
 
 function readFileAsync(file) {
   return new Promise((resolve) => {
