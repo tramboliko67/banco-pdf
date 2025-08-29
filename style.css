@@ -1,52 +1,193 @@
+/* ====== ESTILOS GENERALES ====== */
 body {
-  font-family: Poppins, sans-serif;
-  background: #000003ff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f9fafb;
+  margin: 0;
+  padding: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-height: 100vh;
-  margin: 0;
+  color: #333;
 }
 
 .container {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 800px;
+  width: 95%;
+  background: #ffffff;
+  padding: 25px;
+  margin: 20px;
+  border-radius: 16px;
+  box-shadow: 0px 8px 20px rgba(0,0,0,0.1);
   text-align: center;
-  width: 400px;
-}
-.container2 {
-  background: white;
-  padding: 1px;
-  border-radius: 12px;
-  text-align: center;
-  width: 350px;
 }
 
+h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+/* ====== INPUTS Y BOTONES ====== */
+input[type="file"],
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+input[type="file"]:hover,
+input[type="text"]:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+button {
+  display: inline-block;
+  background: #3498db;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  margin: 10px 5px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background: #2980b9;
+  transform: scale(1.05);
+}
+
+/* Botón especial WhatsApp */
+#sendWhatsApp {
+  background: #25D366;
+}
+
+#sendWhatsApp:hover {
+  background: #1ebe5b;
+}
+
+/* ====== PREVISUALIZACIÓN DE IMÁGENES ====== */
 #preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
   margin: 20px 0;
 }
 
 #preview img {
-  width: 80px;
+  width: 100%;
   height: auto;
-  border-radius: 6px;
-  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  object-fit: cover;
 }
 
-button {
-  background: #007bff;
-  color: white;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 0px;
-  cursor: pointer;
+/* ====== BOTÓN FLOTANTE INSTAGRAM ====== */
+.instagram-float {
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  bottom: 20px;
+  right: 20px;
+  background-color: #E4405F;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  z-index: 9999;
 }
 
-button:hover {
-  background: #0c2947ff;
+.instagram-float img {
+  width: 35px;
+  height: 35px;
+}
+
+.instagram-float:hover {
+  transform: scale(1.1);
+  box-shadow: 0px 6px 15px rgba(0,0,0,0.4);
+}
+
+/* ====== RESPONSIVE DESIGN ====== */
+@media (max-width: 1024px) {
+  .container {
+    max-width: 90%;
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 18px;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  button {
+    width: 100%;
+    margin: 8px 0;
+  }
+
+  #preview {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+
+  .instagram-float {
+    width: 50px;
+    height: 50px;
+    bottom: 15px;
+    right: 15px;
+  }
+
+  .instagram-float img {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  input[type="file"],
+  input[type="text"] {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+
+  button {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+
+  #preview {
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  }
+
+  .instagram-float {
+    width: 45px;
+    height: 45px;
+    bottom: 12px;
+    right: 12px;
+  }
+
+  .instagram-float img {
+    width: 24px;
+    height: 24px;
+  }
 }
