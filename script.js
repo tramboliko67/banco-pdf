@@ -28,9 +28,9 @@ generatePDF.addEventListener("click", async () => {
 
   const pdf = new jsPDF("p", "pt", "letter"); // carta: 612x792 pt
   const margin = 20;
-  const imgWidth = 260;
-  const imgHeight = 150;
-
+  const imgWidth = 250;
+  const imgHeight = 400;
+  
   for (let i = 0; i < images.length; i++) {
     if (i > 0 && i % 8 === 0) {
       pdf.addPage();
