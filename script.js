@@ -27,22 +27,40 @@ generatePDF.addEventListener("click", async () => {
   }
 
   const pdf = new jsPDF("p", "pt", "letter"); // carta: 612x792 pt
-  const margin = 10;
-  const imgWidth = 250;
-  const imgHeight = 600;
+  const margin = 20;
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
 
   for (let i = 0; i < images.length; i++) {
-    if (i > 0 && i % 6 === 0) {
-      pdf.addPage();
-    }
-    const pageIndex = Math.floor(i / 6);
-    const x = margin + (i % 2) * (imgWidth + margin);
-    const y = margin + Math.floor((i % 6 / 2) * (imgHeight + margin);
+    if (i > 0) pdf.addPage();
 
     const file = images[i];
     const reader = await readFileAsync(file);
 
-    pdf.addImage(reader, "JPEG", x, y, imgWidth, imgHeight);
+    // Crear imagen en memoria para leer sus dimensiones originales
+    const img = new Image();
+    img.src = reader;
+
+    await new Promise((resolve) => {
+      img.onload = () => {
+        let imgW = img.width;
+        let imgH = img.height;
+
+        // Escalar manteniendo proporción dentro de la hoja
+        const maxW = pageWidth - margin * 2;
+        const maxH = pageHeight - margin * 2;
+        const ratio = Math.min(maxW / imgW, maxH / imgH);
+
+        imgW *= ratio;
+        imgH *= ratio;
+
+        const x = (pageWidth - imgW) / 2; // centrar
+        const y = (pageHeight - imgH) / 2;
+
+        pdf.addImage(reader, "JPEG", x, y, imgW, imgH);
+        resolve();
+      };
+    });
   }
 
   pdf.save("comprobantes.pdf");
