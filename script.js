@@ -26,51 +26,74 @@ generatePDF.addEventListener("click", async () => {
     return;
   }
 
-  const pdf = new jsPDF("p", "pt", "letter"); // carta: 612x792 pt
-  const margin = 20;
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ unit: "pt", format: "letter", orientation: "portrait" });
 
-  const cols = 2; // 2 columnas
-  const rows = 2; // 2 filas -> 4 imágenes por página
+  const margin = 20;
+  const cols = 2;
+  const rows = 2;
+  const perPage = cols * rows;
+
+  const pageWidth = pdf.internal.pageSize.getWidth();   // 612 pt
+  const pageHeight = pdf.internal.pageSize.getHeight(); // 792 pt
+
   const cellWidth = (pageWidth - margin * (cols + 1)) / cols;
   const cellHeight = (pageHeight - margin * (rows + 1)) / rows;
 
-  for (let i = 0; i < images.length; i++) {
-    if (i > 0 && i % (cols * rows) === 0) {
-      pdf.addPage();
-    }
-
-    const file = images[i];
-    const reader = await readFileAsync(file);
-
-    const img = new Image();
-    img.src = reader;
-
-    await new Promise((resolve) => {
-      img.onload = () => {
-        let imgW = img.width;
-        let imgH = img.height;
-
-        // Escalar manteniendo proporción dentro de la celda
-        const ratio = Math.min(cellWidth / imgW, cellHeight / imgH);
-        imgW *= ratio;
-        imgH *= ratio;
-
-        // Calcular posición en la celda
-        const col = i % cols;
-        const row = Math.floor((i % (cols * rows)) / cols);
-
-        const x = margin + col * (cellWidth + margin) + (cellWidth - imgW) / 2;
-        const y = margin + row * (cellHeight + margin) + (cellHeight - imgH) / 2;
-
-        pdf.addImage(reader, "JPEG", x, y, imgW, imgH);
-        resolve();
-      };
+  // Helper: convierte File -> dataURL
+  function readFileAsync(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
     });
   }
 
-  pdf.save("comprobantes.pdf");
+  for (let i = 0; i < images.length; i++) {
+    // Añadir página nueva solo cuando corresponde (cada perPage elementos)
+    if (i > 0 && i % perPage === 0) {
+      pdf.addPage();
+    }
+
+    const idxInPage = i % perPage;
+    const col = idxInPage % cols;
+    const row = Math.floor(idxInPage / cols);
+
+    const file = images[i];
+    const dataUrl = await readFileAsync(file);
+
+    // Cargar la imagen para conocer dimensiones reales
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.naturalWidth;
+        let h = img.naturalHeight;
+
+        // Escalar manteniendo proporción dentro de la celda
+        const ratio = Math.min(cellWidth / w, cellHeight / h);
+        const drawW = w * ratio;
+        const drawH = h * ratio;
+
+        // Centrar dentro de la celda
+        const x = margin + col * (cellWidth + margin) + (cellWidth - drawW) / 2;
+        const y = margin + row * (cellHeight + margin) + (cellHeight - drawH) / 2;
+
+        const format = dataUrl.startsWith("data:image/png") ? "PNG" : "JPEG";
+        pdf.addImage(dataUrl, format, x, y, drawW, drawH, undefined, "FAST");
+        resolve();
+      };
+      img.onerror = reject;
+      img.src = dataUrl;
+    });
+  }
+
+  // Nombre de archivo: toma de input #pdfName si existe, si no usa fecha
+  const nameInput = document.getElementById("pdfName");
+  let fileName = nameInput && nameInput.value.trim() ? nameInput.value.trim() : `comprobantes_${new Date().toISOString().slice(0,10)}`;
+  // Normalizar nombre (remueve caracteres raros)
+  fileName = fileName.replace(/[^\w\-\.]/g, "_");
+  pdf.save(`${fileName}.pdf`);
 });
 
 
