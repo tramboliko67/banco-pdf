@@ -27,17 +27,17 @@ generatePDF.addEventListener("click", async () => {
   }
 
   const pdf = new jsPDF("p", "pt", "letter"); // carta: 612x792 pt
-  const margin = 20;
+  const margin = 10;
   const imgWidth = 250;
-  const imgHeight = 400;
-  
+  const imgHeight = 600;
+
   for (let i = 0; i < images.length; i++) {
-    if (i > 0 && i % 8 === 0) {
+    if (i > 0 && i % 6 === 0) {
       pdf.addPage();
     }
-    const pageIndex = Math.floor(i / 8);
+    const pageIndex = Math.floor(i / 6);
     const x = margin + (i % 2) * (imgWidth + margin);
-    const y = margin + Math.floor((i % 8) / 2) * (imgHeight + margin);
+    const y = margin + Math.floor((i % 6 / 2) * (imgHeight + margin);
 
     const file = images[i];
     const reader = await readFileAsync(file);
